@@ -8,6 +8,7 @@ from Line import *
 from RFID import *
 from copy import copy, deepcopy
 from API import *
+from createSerial import *
 try:
     import Tkinter as tk
 except ImportError:
@@ -38,16 +39,17 @@ def set_Tk_var():
     combobox = tk.StringVar()
 
 def init(top, gui, *args, **kwargs):
-    global w, top_level,agv, root
+    global w, top_level,agv, root#,serial
     w = gui
     top_level = top
     agv=AGV()
+    #serial=SerialCommandInterface()
     root = top
     root.geometry(windown_size)
 
     w.mapFrame.bind('<Configure>', create_grid)
 
-    global labelsRFID,labelsLine,lines,pickingHolder,step,RFIDstep,grid_coor,matrix
+    global labelsRFID,labelsLine,lines,pickingHolder,step,RFIDstep,grid_coor,matrix,data
     labelsRFID=[]
     labelsLine=[]
     holderItem = []
@@ -56,6 +58,8 @@ def init(top, gui, *args, **kwargs):
     lines = []
     RFIDstep=[]  
     grid_coor=[]
+    data=[]
+    
     #matrix=np.zeros((10,10),int)
     #matrix=matrix.tolist()
 def create_grid(event=None):
@@ -88,26 +92,14 @@ def create_grid(event=None):
                 grid_coor.append((i-grid_size,j-grid_size))
     
 def createLinehorizontal():
-    try:
-        step=int(w.indexLineEntry.get())
-        if step>len(labelsLine)+1:
-            messagebox.showerror(title="Error", message="Index is incorrect")
-            return
-        length=int(w.lenlineEntry.get())
-        function=w.functionEntry.get()
-        head=w.headEntry.get()
-        rotate_type=w.rotatetypeEntry.get()
-        degree_rote=w.degreeroteEntry.get()
-        command=w.commandEntry.get()
-        line_type=w.linetypeEntry.get()
-        speed_max=w.speedmaxEntry.get()
-        wait_time=w.waittimeEntry.get()        
-    except Exception as e:
-        print(e)
-        messagebox.showerror(title="Error", message="Line length not valid")
-        return
+    length=int(w.lenlineEntry.get())
+    function=w.functionEntry.get()
+    rotate_type=w.rotatetypeEntry.get()
+    degree_rote=w.degreeroteEntry.get()
+    speed_max=w.speedmaxEntry.get()
+    wait_time=w.waittimeEntry.get()        
     f = Frame(w.mapFrame, height=LineHorizal['height'], width=length*LineHorizal['width'], bg="black")
-    labelsLine.append(Line(step,f,length,function,head,rotate_type,degree_rote,command,line_type,speed_max,wait_time))
+    labelsLine.append(Line(f,length,function,rotate_type,degree_rote,speed_max,wait_time))
     f.pack_propagate(0) # don't shrink
     f.place(x = 0, y = 0)
     f.bind("<Button-1>",drag_start)
@@ -116,25 +108,15 @@ def createLinehorizontal():
     f.bind("<Button-3>",popup)
     f.bind("<Enter>",information)  
 def createLinevertical():  
-    try:
-        step=int(w.indexLineEntry.get())
-        if step>len(labelsLine)+1:
-            messagebox.showerror(title="Error", message="Index is incorrect")
-            return
-        length=int(w.lenlineEntry.get())
-        function=w.functionEntry.get()
-        head=w.headEntry.get()
-        rotate_type=w.rotatetypeEntry.get()
-        degree_rote=w.degreeroteEntry.get()
-        command=w.commandEntry.get()
-        line_type=w.linetypeEntry.get()
-        speed_max=w.speedmaxEntry.get()
-        wait_time=w.waittimeEntry.get()
-    except:
-        messagebox.showerror(title="Error", message="Line length is not valid")
-        return
+    length=int(w.lenlineEntry.get())
+    function=w.functionEntry.get()
+    rotate_type=w.rotatetypeEntry.get()
+    degree_rote=w.degreeroteEntry.get()
+    speed_max=w.speedmaxEntry.get()
+    wait_time=w.waittimeEntry.get()
+    
     f = Frame(w.mapFrame, height=length*LineVertical['height'], width=LineVertical['width'], bg="black")
-    labelsLine.append(Line(step,f,length,function,head,rotate_type,degree_rote,command,line_type,speed_max,wait_time))
+    labelsLine.append(Line(f,length,function,rotate_type,degree_rote,speed_max,wait_time))
     f.pack_propagate(0) # don't shrink
     f.place(x = 0, y = 0)
     f.bind("<Button-1>",drag_start)
@@ -152,7 +134,7 @@ def createRFID():
         messagebox.showerror(title="Error", message="Index is incorrect")
         return
     nameRFID=w.nameRFIDEntry.get()
-    if w.nameRFIDEntry.get()=="" or  len(w.nameRFIDEntry.get())!=5:
+    if w.nameRFIDEntry.get()=="" or  len(w.nameRFIDEntry.get())!=8:
         messagebox.showerror(title="Error", message="Name RFID not valid")
         return    
 
@@ -215,19 +197,13 @@ def refreshItem():
 def information(event):
     widget=event.widget
     for i in range(0,len(labelsLine)):
-        if widget==labelsLine[i].getId():
-            step=labelsLine[i].getStep()
+        if widget==labelsLine[i].getId():            
             lenLine=labelsLine[i].getLength()
-            function=labelsLine[i].getFunction()
-            head=labelsLine[i].getHead()
+            function=labelsLine[i].getFunction()           
             rotate_type=labelsLine[i].getRotatetype()
-            degree_rote=labelsLine[i].getDegreerote()
-            command=labelsLine[i].getCommand()
-            line_type=labelsLine[i].getLinetype()
+            degree_rote=labelsLine[i].getDegreerote()            
             speed_max=labelsLine[i].getSpeedmax()
-            wait_time=labelsLine[i].getWaittime()
-            w.indexLineEntry.delete(0,END)
-            w.indexLineEntry.insert(0,step)
+            wait_time=labelsLine[i].getWaittime()            
             w.lenlineEntry.delete(0,END)
             w.lenlineEntry.insert(0,lenLine)
             w.degreeroteEntry.delete(0,END)
@@ -236,19 +212,10 @@ def information(event):
             w.waittimeEntry.insert(0,wait_time)
             for j,item in enumerate(w.functionEntry["values"]):
                 if(item==function):
-                    w.functionEntry.current(j)  
-            for j,item in enumerate(w.headEntry["values"]):
-                if(item==head):
-                    w.headEntry.current(j)
+                    w.functionEntry.current(j)             
             for j,item in enumerate(w.rotatetypeEntry["values"]):
                 if(item==rotate_type):
-                    w.rotatetypeEntry.current(j)  
-            for j,item in enumerate(w.commandEntry["values"]):
-                if(item==command):
-                    w.commandEntry.current(j)  
-            for j,item in enumerate(w.linetypeEntry["values"]):
-                if(item==line_type):
-                    w.linetypeEntry.current(j)
+                    w.rotatetypeEntry.current(j)                           
             for j,item in enumerate(w.speedmaxEntry["values"]):
                 if(item==speed_max):
                     w.speedmaxEntry.current(j)   
@@ -322,23 +289,12 @@ def lengLine():
         pickingHolder.config(height= int(lenLine)*LineVertical['height'])
 
 def crossroadLine():
-    try:
-        step=int(w.indexLineEntry.get())
-        if step>len(labelsLine)+1:
-            messagebox.showerror(title="Error", message="Index is incorrect")
-            return
-        length=int(w.lenlineEntry.get())
-        function=w.functionEntry.get()
-        head=w.headEntry.get()
-        rotate_type=w.rotatetypeEntry.get()
-        degree_rote=w.degreeroteEntry.get()
-        command=w.commandEntry.get()
-        line_type=w.linetypeEntry.get()
-        speed_max=w.speedmaxEntry.get()
-        wait_time=w.waittimeEntry.get()
-    except:
-        messagebox.showerror(title="Error", message="Line length is not valid")
-        return
+    length=int(w.lenlineEntry.get())
+    function=w.functionEntry.get()
+    rotate_type=w.rotatetypeEntry.get()
+    degree_rote=w.degreeroteEntry.get()    
+    speed_max=w.speedmaxEntry.get()
+    wait_time=w.waittimeEntry.get()
     f = Frame(w.mapFrame, height=grid_size*2, width=grid_size*2, bg="#d9d9d9")
     k=Frame(f, height=LineVertical['height'], width=LineVertical['width'], bg="black")
     j = Frame(f, height=LineHorizal['height'], width=LineHorizal['width'], bg="black")
@@ -346,7 +302,7 @@ def crossroadLine():
     j.place(y=grid_size/2+4, x = 0)
     f.pack_propagate(0) # don't shrink    
     f.place(x = 0, y = 0)
-    labelsLine.append(Line(step,f,length,function,head,rotate_type,degree_rote,command,line_type,speed_max,wait_time))
+    labelsLine.append(Line(f,length,function,rotate_type,degree_rote,speed_max,wait_time))
     f.bind("<Button-1>",drag_start)
     f.bind("<B1-Motion>",drag_motion)
     f.bind("<ButtonRelease-1>",drop_motion)
@@ -354,6 +310,8 @@ def crossroadLine():
     f.bind("<Enter>",information) 
 def send(): 
     print(len(step))
+    for i in range(0,len(step)):
+        serial.write(step[i])
     messagebox.showinfo(title="Information", message="Done") 
 
 def view():
@@ -363,13 +321,38 @@ def view():
     for i in range(0,len(RFIDstep)):
         print(RFIDstep[i].getName())
 def reset():
-    global step,RFIDstep,matrix
+    global step,data
     step=[]
+    data=[]
+    messagebox.showinfo(title="Information", message="Done") 
+
+def copy_object(obj):
+    new_object=[]
+    for item in obj:
+        new_object.append(copy(item))
+    return new_object
+    
+def setupStep():
+    global RFIDstep,matrix,step
     RFIDstep=[]
+    nameRFID=[]
+    pathRFID=[]
+    pathRFID_Item=[]
+    pathLine=[]
+    pathLine_Item=[]
+    command=[]
+    lineType=[]
+    lenLine=[]
+    degree_rote=[]
+    wait_time=[]
+    speed_max=[]
+    function=[]
+    head=[]
+    rotate_type=[]
+    
     #messagebox.showinfo(title="Information", message="Done") 
         
     matrix=np.zeros((len(y_info),len(x_info)),int)
-    #matrix=np.zeros((10,10),int)
     matrix=matrix.tolist()
     for i in range(0,len(labelsRFID)):
         x_labels=int((labelsRFID[i].getId().winfo_x()))
@@ -386,34 +369,9 @@ def reset():
                 matrix[int(y_labels/30)][int(x_labels/30)+j]=1
         else:
             for j in range(0,int(heightLine/30)):
-                matrix[int(y_labels/30)+j][int(x_labels/30)]=1
-    #path=bfs(matrix)
-    #print(matrix)
-def copy_object(obj):
-    new_object=[]
-    for item in obj:
-        new_object.append(copy(item))
-    return new_object
-    
-def setupStep():
-    global step,matrix
+                matrix[int(y_labels/30)+j][int(x_labels/30)]=1   
     start=int(w.startEntry.get())
-    end=int(w.endEntry.get())
-    route=int(w.routeEntry.get())
-    nameRFID=[]
-    pathRFID=[]
-    pathRFID_Item=[]
-    pathLine=[]
-    pathLine_Item=[]
-    command=[]
-    lineType=[]
-    lenLine=[]
-    degree_rote=[]
-    wait_time=[]
-    speed_max=[]
-    function=[]
-    head=[]
-    rotate_type=[]
+    end=int(w.endEntry.get())    
     for i in range(0,len(labelsRFID)):
         x_pathRFID=int(labelsRFID[i].getId().winfo_x()/30)
         y_pathRFID=int(labelsRFID[i].getId().winfo_y() /30)
@@ -428,11 +386,12 @@ def setupStep():
     for i in range(0,len(labelsLine)):
         x_pathLine=int(labelsLine[i].getId().winfo_x()/30)
         y_pathLine=int(labelsLine[i].getId().winfo_y() /30)
-        pathLine.append((x_pathLine,y_pathLine))                    
+        pathLine.append((x_pathLine,y_pathLine))   
     path=bfs(matrix,(x_start,y_start))
+    
     for i in range(0,len(path)):
         if path[i] in pathRFID:
-            pathRFID_Item.append(path[i])                
+            pathRFID_Item.append(path[i])           
     for i in range(0,len(path)):
         if path[i] in pathLine:
             pathLine_Item.append(path[i])    
@@ -441,30 +400,34 @@ def setupStep():
         
     for i in range(0,len(pathLine_Item)):
         lineType.append(check_cross_type_line(pathLine_Item[i],matrix))
-    for i in range(0,len(labelsRFID)):
-        x_pathRFID=int(labelsRFID[i].getId().winfo_x()/30)
-        y_pathRFID=int(labelsRFID[i].getId().winfo_y() /30)
-        if (x_pathRFID,y_pathRFID) in pathRFID_Item:
-            nameRFID.append(labelsRFID[i].getName())
-    for i in range(0,len(labelsLine)):
-        x_pathLine=int(labelsLine[i].getId().winfo_x()/30)
-        y_pathLine=int(labelsLine[i].getId().winfo_y() /30)
-        if (x_pathLine,y_pathLine) in pathLine_Item:
-            lenLine.append(labelsLine[i].getLength())
-            function.append(labelsLine[i].getFunction())
-            head.append(labelsLine[i].getHead())
-            rotate_type.append(labelsLine[i].getRotatetype())
-            degree_rote.append(labelsLine[i].getDegreerote())  
-            wait_time.append(labelsLine[i].getWaittime())
-            speed_max.append(labelsLine[i].getSpeedmax())
+    for i in range(0,len(pathRFID_Item)):
+        for j in range(0,len(labelsRFID)):
+            x_pathRFID=int(labelsRFID[j].getId().winfo_x()/30)
+            y_pathRFID=int(labelsRFID[j].getId().winfo_y() /30)
+            if pathRFID_Item[i]==(x_pathRFID,y_pathRFID):
+                nameRFID.append(labelsRFID[j].getName())       
+    for i in range(0,len(pathLine_Item)):
+        head.append(w.headEntry.get())	
+        for j in range(0,len(labelsLine)):
+            x_pathLine=int(labelsLine[j].getId().winfo_x()/30)
+            y_pathLine=int(labelsLine[j].getId().winfo_y() /30)
+            if(pathLine_Item[i]==(x_pathLine,y_pathLine)):
+                lenLine.append(labelsLine[j].getLength())
+                function.append(labelsLine[j].getFunction())
+                #head.append(labelsLine[j].getHead())
+                rotate_type.append(labelsLine[j].getRotatetype())
+                degree_rote.append(labelsLine[j].getDegreerote())  
+                wait_time.append(labelsLine[j].getWaittime())
+                speed_max.append(labelsLine[j].getSpeedmax())
     status_line=change_type_line(command,lineType)
-    data=[]
+    
+    print(command)
     for i in range(0,len(pathLine_Item)):
         data.append((head[i],function[i],rotate_type[i],lenLine[i],degree_rote[i],command[i],status_line[i],nameRFID[i+1],speed_max[i],wait_time[i]))
     for i in range(0,len(data)):
-        data_process=agv.process_step_data(data)
-    step=data_process    
-    print(data_process)
+        step=agv.process_step_data(data)
+       
+    print(step)
 def drag_start(event):
     global pickingHolder
     widget = event.widget

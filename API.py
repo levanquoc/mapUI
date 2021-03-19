@@ -54,7 +54,7 @@ class AGV(object):
             line_type=LINE_TYPE[data[i][6]]
             
             RFID_data=data[i][7]
-            if(len(RFID_data)==5):
+            if(len(RFID_data)==8):
                 hex1=hex(ord(RFID_data[0]))
                 hex1=int(hex1,0)
                 hex2=hex(ord(RFID_data[1]))
@@ -65,6 +65,12 @@ class AGV(object):
                 hex4=int(hex4,0)
                 hex5=hex(ord(RFID_data[4]))
                 hex5=int(hex5,0)
+                hex6=hex(ord(RFID_data[5]))
+                hex6=int(hex6,0)
+                hex7=hex(ord(RFID_data[6]))
+                hex7=int(hex7,0)
+                hex8=hex(ord(RFID_data[7]))
+                hex8=int(hex8,0)
                 #print(hex1,hex2,hex3,hex4,hex5)
             else:
                 hex1=hex2=hex3=hex4=hex5=0x20
@@ -74,7 +80,7 @@ class AGV(object):
             wait_time=self.pack_data_2bytes(data[i][9]) 
             bytes_one_wait_time     =wait_time[0]
             bytes_second_wait_time  =wait_time[1]
-            data_opcode=(step,select_head,function,rotate_type,a,b,c,d,line_turn_command,line_type,hex1,hex2,hex3,hex4,hex5,speed_max,bytes_one_wait_time,bytes_second_wait_time)
+            data_opcode=(step,select_head,function,rotate_type,a,b,c,d,line_turn_command,line_type,hex1,hex2,hex3,hex4,hex5,hex6,hex7,hex8,speed_max,bytes_one_wait_time,bytes_second_wait_time)
             #data_opcode=(step,select_head,function,rotate_type,a,b,c,d,line_turn_command,line_type,speed_max,bytes_one_wait_time,bytes_second_wait_time)
             data_process.append(data_opcode)
         return data_process

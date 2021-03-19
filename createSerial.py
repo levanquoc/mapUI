@@ -1,7 +1,7 @@
 import serial
 from struct import Struct
 import struct
-from JETSON.OI import *
+from OI import *
 unpack_unsigned_byte = Struct('B').unpack
 unpack_unsigned_2byte = Struct('H').unpack
 
