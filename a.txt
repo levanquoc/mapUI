@@ -1,0 +1,4 @@
+{'name': 'LineHorizal', 'f': '.!canvas.!frame', 'length': 1, 'function': 'Line', 'line_type': '1', 'degree_rote': '1', 'rotate_type': 'Side', 'speed_max': 'High', 'wait_time': '1', 'x': 180, 'y': 162}
+{'name': 'LineCross', 'f': '.!canvas.!frame3', 'length': 1, 'function': 'Line', 'line_type': '1', 'degree_rote': '1', 'rotate_type': 'Side', 'speed_max': 'High', 'wait_time': '1', 'x': 210, 'y': 180}
+{'name': 'Linevertical', 'f': '.!canvas.!frame2', 'length': 1, 'function': 'Line', 'line_type': '1', 'degree_rote': '1', 'rotate_type': 'Side', 'speed_max': 'High', 'wait_time': '1', 'x': 252, 'y': 150}
+{'name': 'RFID', 'f': '.!canvas.!frame4', 'step': 1, 'nameRFID': '11111111', 'x': 300, 'y': 180}

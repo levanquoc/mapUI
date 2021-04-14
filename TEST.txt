@@ -1,0 +1,13 @@
+{'name': 'LineHorizal', 'f': '.!canvas.!frame10', 'length': 9, 'function': 'Line', 'line_type': 'One', 'degree_rote': '0', 'rotate_type': 'None', 'speed_max': 'Normal', 'wait_time': '0', 'x': 150, 'y': 612}
+{'name': 'LineCross', 'f': '.!canvas.!frame8', 'length': 1, 'function': 'Line', 'line_type': 'One', 'degree_rote': '0', 'rotate_type': 'None', 'speed_max': 'Normal', 'wait_time': '0', 'x': 90, 'y': 600}
+{'name': 'LineCross', 'f': '.!canvas.!frame12', 'length': 1, 'function': 'Line', 'line_type': 'One', 'degree_rote': '0', 'rotate_type': 'None', 'speed_max': 'Normal', 'wait_time': '0', 'x': 450, 'y': 600}
+{'name': 'Linevertical', 'f': '.!canvas.!frame2', 'length': 2, 'function': 'Line', 'line_type': 'One', 'degree_rote': '0', 'rotate_type': 'None', 'speed_max': 'Normal', 'wait_time': '0', 'x': 102, 'y': 750}
+{'name': 'Linevertical', 'f': '.!canvas.!frame6', 'length': 2, 'function': 'Hook', 'line_type': 'One', 'degree_rote': '0', 'rotate_type': 'None', 'speed_max': 'Normal', 'wait_time': '0', 'x': 102, 'y': 660}
+{'name': 'Linevertical', 'f': '.!canvas.!frame14', 'length': 2, 'function': 'Hook', 'line_type': 'One', 'degree_rote': '0', 'rotate_type': 'None', 'speed_max': 'Normal', 'wait_time': '0', 'x': 462, 'y': 660}
+{'name': 'RFID', 'f': '.!canvas.!frame', 'step': 1, 'nameRFID': 'cu011111', 'x': 90, 'y': 810}
+{'name': 'RFID', 'f': '.!canvas.!frame3', 'step': 2, 'nameRFID': 'cu011111', 'x': 90, 'y': 720}
+{'name': 'RFID', 'f': '.!canvas.!frame7', 'step': 3, 'nameRFID': 'cu011111', 'x': 90, 'y': 630}
+{'name': 'RFID', 'f': '.!canvas.!frame9', 'step': 4, 'nameRFID': 'cu011111', 'x': 120, 'y': 600}
+{'name': 'RFID', 'f': '.!canvas.!frame11', 'step': 5, 'nameRFID': 'cu011111', 'x': 420, 'y': 600}
+{'name': 'RFID', 'f': '.!canvas.!frame13', 'step': 6, 'nameRFID': 'cu011111', 'x': 450, 'y': 630}
+{'name': 'RFID', 'f': '.!canvas.!frame15', 'step': 7, 'nameRFID': 'cu011111', 'x': 450, 'y': 720}

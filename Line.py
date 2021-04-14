@@ -1,9 +1,10 @@
 class Line:
-    def __init__(self,ids,length,function,rotate_type,degree_rote,speed_max,wait_time):
+    def __init__(self,ids,length,function,line_type,rotate_type,degree_rote,speed_max,wait_time):
         
         self.ids = ids
         self.length=length
-        self.function=function    
+        self.function=function 
+        self.line_type=line_type
         self.rotate_type=rotate_type
         self.degree_rote=degree_rote         
         self.speed_max=speed_max
@@ -21,7 +22,12 @@ class Line:
 
     def getFunction(self):
     
-        return self.function               
+        return self.function 
+        
+    def getLinetype(self):
+    
+        return self.line_type
+        
     def getRotatetype(self):
     
         return self.rotate_type
@@ -48,9 +54,14 @@ class Line:
 
     def setFunction(self,function):
     
-        self.function=function          
+        self.function=function   
+        
+    def setLinetype(self,line_type):
+    
+        self.line_type=line_type
         
     def setRotatetype(self,rotate_type):
+    
         self.rotate_type=rotate_type
         
     def setDegreerote(self,degree_rote):
