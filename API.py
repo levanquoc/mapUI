@@ -161,20 +161,20 @@ class AGV(object):
             step=self.tohex(int(i)+1,8)
             step=int(step,0)
             #print(step)
-            select_head=SELECT_HEAD[data[i][0]]
+            select_head=SELECT_HEAD[data[i][1]]
             #print(select_head)
-            function=FUNCTION[data[i][1]]
-            rotate_type=ROTATE_TYPE[data[i][2]]
-            distance=self.pack_data_2bytes(data[i][3])
+            function=FUNCTION[data[i][2]]
+            rotate_type=ROTATE_TYPE[data[i][3]]
+            distance=self.pack_data_2bytes(data[i][4])
             a=distance[0]
             b=distance[1]
-            degree_rotate=self.pack_data_2bytes(data[i][4])
+            degree_rotate=self.pack_data_2bytes(data[i][5])
             c=degree_rotate[0]
             d=degree_rotate[1]
-            line_turn_command=COMMAND[data[i][5]]
-            line_type=LINE_TYPE[data[i][6]]
+            line_turn_command=COMMAND[data[i][6]]
+            line_type=LINE_TYPE[data[i][7]]
             
-            RFID_data=data[i][7]
+            RFID_data=data[i][8]
             if(len(RFID_data)==8):
                 hex1=hex(ord(RFID_data[0]))
                 hex1=int(hex1,0)
@@ -197,8 +197,8 @@ class AGV(object):
                 hex1=hex2=hex3=hex4=hex5=hex6=hex7=hex8=0x20
                 #print(hex1,hex2,hex3,hex4,hex5)
    
-            speed_max=SPEED_MAX[data[i][8]]    
-            wait_time=self.pack_data_2bytes(data[i][9]) 
+            speed_max=SPEED_MAX[data[i][9]]    
+            wait_time=self.pack_data_2bytes(data[i][10]) 
             bytes_one_wait_time     =wait_time[0]
             bytes_second_wait_time  =wait_time[1]
             data_opcode=(step,select_head,function,rotate_type,c,d,line_turn_command,line_type,hex1,hex2,hex3,hex4,hex5,hex6,hex7,hex8,speed_max,a,b,bytes_one_wait_time,bytes_second_wait_time)

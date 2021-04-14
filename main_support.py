@@ -46,7 +46,7 @@ def init(top, gui, *args, **kwargs):
     global w, top_level,agv, root#,serial
     w = gui
     top_level = top
-    #agv=AGV()
+    agv=AGV()
     #serial=SerialCommandInterface()
     root = top
     root.geometry(windown_size)
@@ -366,8 +366,8 @@ def loadDesign():
             f.bind("<Enter>",information) 
            
 def saveDesign(): 
-    print(len(labelsLinehorizontal))
-    print(len(labelsLinevertical))
+    #print(len(labelsLinehorizontal))
+    #print(len(labelsLinevertical))
     f = tkinter.filedialog.asksaveasfile(mode='w', defaultextension=".txt")
     if f is None: # asksaveasfile return `None` if dialog closed with "cancel".
         return    
@@ -464,21 +464,7 @@ def lengLine():
     else:
         pickingHolder.config(height= int(lenLine)*LineVertical['height'])
 
-def send():
-    try:
-        nameAGV=int(w.nameAGV.get())
-    except:
-        messagebox.showerror(title="Error",message="AGV's name is not correct")
-        return        
-    dem=0
-    for i in range(0,len(step)):
-        libtcod.console_check_for_keypress()
-        if(agv.send_step(nameAGV,step[i])):
-            dem=dem+1
-    if(dem==len(step)):        
-        messagebox.showinfo(title="Information", message="Done") 
-    else:
-        messagebox.showerror(title="Error", message="Communication error") 
+
 
 def view():
     global step
@@ -541,6 +527,7 @@ def checkStatus():
             
 
 def setupStep():
+    
     global RFIDstep,matrix,step
     RFIDstep=[]
     nameRFID=[]
@@ -550,14 +537,14 @@ def setupStep():
     pathLine_Item=[]
     command=[]
     line_type=[]
-    lineType=[]
     lenLine=[]
     degree_rote=[]
     wait_time=[]
     speed_max=[]
     function=[]
     head=[]
-    rotate_type=[]    
+    rotate_type=[]   
+    ids=[]   
     #messagebox.showinfo(title="Information", message="Done")         
     matrix=np.zeros((len(y_info),len(x_info)),int) #create matrix 0
     matrix=matrix.tolist()
@@ -578,21 +565,61 @@ def setupStep():
         messagebox.showerror("Error","Route not found")
         return        
     pathRFID_Item,pathLine_Item=find__item_path(path,pathRFID,pathLine,pathRFID_Item,pathLine_Item)
+    
     command=make_command(pathRFID_Item,pathLine_Item,command)
     nameRFID,_=find_RFIDname_in_route(pathRFID_Item,labelsRFID)
-    head,lenLine,function,line_type,rotate_type,degree_rote,wait_time,speed_max=status_line_in_route(pathLine_Item,labelsLine,head,lenLine,function,line_type,rotate_type,degree_rote,wait_time,speed_max,head_select)#status line
-              
+    ids,head,lenLine,function,line_type,rotate_type,degree_rote,wait_time,speed_max=status_line_in_route(pathLine_Item,labelsLine,ids,head,lenLine,function,line_type,rotate_type,degree_rote,wait_time,speed_max,head_select)#status line
+            
     status_line=change_type_line(matrix,labelsRFID,labelsLine,command,line_type,head,pathLine_Item,pathRFID_Item)
-    print(status_line)
+    
+    
     for i in range(0,len(pathLine_Item)):
-        data.append((head[i],function[i],rotate_type[i],lenLine[i],degree_rote[i],command[i],status_line[i],nameRFID[i+1],speed_max[i],wait_time[i]))
+        data.append([ids[i],head[i],function[i],rotate_type[i],lenLine[i],degree_rote[i],command[i],status_line[i],nameRFID[i+1],speed_max[i],wait_time[i]])
+    
+    #print(data)
+    '''
     for i in range(0,len(data)):
         step=agv.process_step_data(data)    
     
     for i in range(0,len(command)):
         print(head[i],function[i],rotate_type[i],degree_rote[i],command[i],status_line[i],nameRFID[i],speed_max[i],lenLine[i],wait_time[i]) 
-        
-def make_step(pathLine_Item,head,function,rotate_type,lenLine,degree_rote,command,status_line,nameRFID,speed_max,wait_time,data,step) :       
+    ''' 
+def send():
+    try:
+        nameAGV=int(w.nameAGV.get())
+    except:
+        messagebox.showerror(title="Error",message="AGV's name is not correct")
+        return        
+    dem=0
+    count=0
+
+    if len(data)>0:
+        for j in range (0,len(labelsLine)):
+            
+            for i in range (0,len(data)):
+                if(labelsLine[j].getId()==data[i][0] and labelsLine[j].getFunction()=="Hook"):
+                    print(type(data[i][2]))
+                    count=count+1
+                    if count%2==0:
+                        data[i][2]="Line"   
+            count=0        
+                   
+        for i in range(0,len(data)):
+            step=agv.process_step_data(data)  
+            print(data[i][2])
+        for i in range(0,len(step)):
+            libtcod.console_check_for_keypress()
+            if(agv.send_step(nameAGV,step[i])):
+                dem=dem+1
+        if(dem==len(step)):        
+            messagebox.showinfo(title="Information", message="Done") 
+        else:
+            messagebox.showerror(title="Error", message="Communication error")     
+    else:
+        messagebox.showinfo(title="Information", message="Route not found")
+
+          
+    def make_step(pathLine_Item,head,function,rotate_type,lenLine,degree_rote,command,status_line,nameRFID,speed_max,wait_time,data,step) :       
         for i in range(0,len(pathLine_Item)):
             data.append((head[i],function[i],rotate_type[i],lenLine[i],degree_rote[i],command[i],status_line[i],nameRFID[i+1],speed_max[i],wait_time[i]))
         for i in range(0,len(data)):
@@ -665,13 +692,14 @@ def find_Linename_in_route(pathLine_Item,labelsLine):
                 if pathLine_Item[i]==(x_pathLine,y_pathLine):
                     nameLine.append(labelsLine[j])   
         return nameLine          
-def status_line_in_route(pathLine_Item,labelsLine,head,lenLine,function,line_type,rotate_type,degree_rote,wait_time,speed_max,head_select):    
+def status_line_in_route(pathLine_Item,labelsLine,ids,head,lenLine,function,line_type,rotate_type,degree_rote,wait_time,speed_max,head_select):    
     for i in range(0,len(pathLine_Item)):
         head.append(head_select)    
         for j in range(0,len(labelsLine)):
             x_pathLine=int(labelsLine[j].getId().winfo_x()/30)
             y_pathLine=int(labelsLine[j].getId().winfo_y() /30)
             if(pathLine_Item[i]==(x_pathLine,y_pathLine)):
+                ids.append(labelsLine[j].getId())
                 lenLine.append(labelsLine[j].getLength())
                 function.append(labelsLine[j].getFunction())
                 line_type.append(labelsLine[j].getLinetype())
@@ -679,7 +707,7 @@ def status_line_in_route(pathLine_Item,labelsLine,head,lenLine,function,line_typ
                 degree_rote.append(labelsLine[j].getDegreerote())  
                 wait_time.append(labelsLine[j].getWaittime())
                 speed_max.append(labelsLine[j].getSpeedmax())                
-    return  head,lenLine,function,line_type,rotate_type,degree_rote,wait_time,speed_max  
+    return  ids,head,lenLine,function,line_type,rotate_type,degree_rote,wait_time,speed_max  
 def change_type_line(matrix,labelsRFID,labelsLine,command,line_type,head,pathLine_Item,pathRFID_Item):
     status_line=[] 
     _,RFID=find_RFIDname_in_route(pathRFID_Item,labelsRFID)
